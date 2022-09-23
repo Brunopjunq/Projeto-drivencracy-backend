@@ -33,3 +33,20 @@ export async function postPoll(req,res) {
         
     }
 }
+
+export async function getChoices(req,res) {
+    const id = req.params.id;
+
+    try {
+
+        const choices = await db.collection('choices').find({ pollId: id}).toArray();
+
+        if(choices.length === 0) {
+            return res.status(404).send('Enquete não existe');
+        }
+        res.status(200).send(choices);
+
+    } catch (error) {
+        res.sendStatus(500);
+    }
+}
