@@ -25,8 +25,11 @@ export async function postPoll(req,res) {
     }
 
     try {
+        await db.collection('polls').insertOne(poll);
+        res.status(201).send('Enquente criada com sucesso!')
         
     } catch (error) {
+        return res.sendStatus(500);
         
     }
 }
