@@ -38,3 +38,9 @@ export async function postChoice(req,res) {
         res.sendStatus(500);
     }
 }
+
+export async function postVote(req,res){
+    const id = req.params.id
+
+    
+}
