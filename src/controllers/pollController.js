@@ -70,7 +70,6 @@ export async function getResult(req,res) {
             for(let j = 0; j < votes.length; j++) {
                 if(choices[i]._id === (new ObjectId(votes[j].choiceId).toString())) {
                     counter[i]++;
-                    ranking = i;
                     if(counter[i] > biggest) {
                         ranking = i;
                         biggest = counter[i];
