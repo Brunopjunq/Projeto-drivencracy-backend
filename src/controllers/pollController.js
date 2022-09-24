@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { ObjectId } from 'mongodb';
 import db from '../db.js';
 
 export async function getPoll(req,res) {
@@ -45,6 +46,48 @@ export async function getChoices(req,res) {
             return res.status(404).send('Enquete não existe');
         }
         res.status(200).send(choices);
+
+    } catch (error) {
+        res.sendStatus(500);
+    }
+}
+
+export async function getResult(req,res) {
+    const id = req.params.id;
+
+    try {
+        const votes = await db.collection('votes').find().toArray();
+        const choices = await db.collection('choices').find({pollId: id}).toArray();
+        const counter = [];
+        let ranking = 0;
+        let biggest = 0;
+
+        for(let i = 0; i < choices.length; i++) {
+            counter.push(0);
+        }
+
+        for(let i = 0; i < choices.length; i++) {
+            for(let j = 0; j < votes.length; j++) {
+                if(choices[i]._id === (new ObjectId(votes[j].choiceId).toString())) {
+                    counter[i]++;
+                    ranking = 1;
+                    if(counter[i] > biggest) {
+                        ranking = i;
+                        biggest = counter[i];
+                    }
+                }
+            }
+        }
+
+        const poll = await db.collection('polls').find({_id: new ObjectId(id)}).toArray();
+
+        res.send({
+            ...poll, 
+            result: {
+                title: choices[ranking].title,
+                votes: Math.max(...counter)
+            }});
+
 
     } catch (error) {
         res.sendStatus(500);
