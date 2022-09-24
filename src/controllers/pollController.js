@@ -58,36 +58,26 @@ export async function getResult(req,res) {
     try {
         const votes = await db.collection('votes').find().toArray();
         const choices = await db.collection('choices').find({pollId: id}).toArray();
-        const counter = [];
-        let ranking = 0;
-        let biggest = 0;
-
-        for(let i = 0; i < choices.length; i++) {
-            counter.push(0);
+        const Idchoices = choices.map((choice) => choice._id.toString());
+        const filterVotes = votes.filter((vote) => choices.includes(vote.choiceId));
+        const filterVotesId = filterVotes.map((vote) => vote.choiceId);
+        
+        function findBiggest(votes) {
+            return votes.sort((a,b) => votes.filter(vote => vote===a).length - votes.filter(vote => vote===b).length).pop();
         }
 
-        for(let i = 0; i < choices.length; i++) {
-            for(let j = 0; j < votes.length; j++) {
-                if(choices[i]._id === (new ObjectId(votes[j].choiceId).toString())) {
-                    counter[i]++;
-                    if(counter[i] > biggest) {
-                        ranking = i;
-                        biggest = counter[i];
-                    }
-                }
-            }
-        }
-
-        const poll = await db.collection('polls').find({_id: new ObjectId(id)}).toArray();
+        const IdBiggest = findBiggest(filterVotesId);
+        const QntVotes = filterVotes.filter((vote) => vote.choiceId === IdBiggest).length;
+        const mostVoted = choices.filter((choice) => choice._id.toString() === IdBiggest);
+        const poll = await db.collection('polls').findOne({_id: ObjectId(id)})
 
         res.send({
-            ...poll, 
+            ...poll,
             result: {
-                title: choices[ranking].title,
-                votes: Math.max(...counter)
-            }});
-
-
+                title: mostVoted[0].title,
+                votes: QntVotes
+            }
+        })
     } catch (error) {
         res.sendStatus(500);
     }
