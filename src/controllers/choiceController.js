@@ -7,7 +7,8 @@ export async function postChoice(req,res) {
 
     const choice = {
         title: body.title,
-        pollId: body.pollId
+        pollId: body.pollId,
+        votes: 0
     }
 
     try {
