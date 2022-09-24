@@ -58,7 +58,7 @@ export async function postVote(req,res){
         const pollExpDate = pollExist.expireAt;
         const Datenow = dayjs().format("YYYY-MM-DD HH:mm");
 
-        if(now > pollExpDate) {
+        if(Datenow > pollExpDate) {
             return res.status(403).send('Enquente expirou!');
         }
 
