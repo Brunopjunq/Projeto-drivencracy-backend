@@ -7,8 +7,7 @@ export async function postChoice(req,res) {
 
     const choice = {
         title: body.title,
-        pollId: body.pollId,
-        votes: 0
+        pollId: body.pollId
     }
 
     try {
@@ -42,6 +41,10 @@ export async function postChoice(req,res) {
 
 export async function postVote(req,res){
     const id = req.params.id
+    const vote = {
+        createdAt: dayjs().format('YYYY-M-DD HH:mm'),
+        choiceId: id
+    }
 
     try {
         const choiceExist = await db.collection('choices').findOne({_id: new ObjectId(id)});
@@ -59,7 +62,7 @@ export async function postVote(req,res){
             return res.status(403).send('Enquente expirou!');
         }
 
-        await db.collection('choices').findOneAndUpdate({_id: ObjectId(id)}, {$inc: {votes: 1}});
+        await db.collection('votes').insertOne(vote);
 
         res.status(201).send('Voto computado!');
 
