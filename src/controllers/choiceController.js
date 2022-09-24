@@ -64,6 +64,6 @@ export async function postVote(req,res){
         res.status(201).send('Voto computado!');
 
     } catch (error) {
-        res.sendStatus(500);
+        res.status(500).send(error);
     }
 }
