@@ -42,5 +42,27 @@ export async function postChoice(req,res) {
 export async function postVote(req,res){
     const id = req.params.id
 
-    
+    try {
+        const choiceExist = await db.collection('choices').findOne({_id: new ObjectId(id)});
+
+        if(!choiceExist){
+            return res.status(404).send('Esta opção não existe');
+        }
+
+        const pollExist = await db.collection('polls').findOne({_id: new ObjectId(choiceExist.pollId)});
+
+        const pollExpDate = pollExist.expireAt;
+        const Datenow = dayjs().format("YYYY-MM-DD HH:mm");
+
+        if(now > pollExpDate) {
+            return res.status(403).send('Enquente expirou!');
+        }
+
+        await db.collection('choices').findOneAndUpdate({_id: ObjectId(id)}, {$inc: {votes: 1}});
+
+        res.status(201).send('Voto computado!');
+
+    } catch (error) {
+        res.sendStatus(500);
+    }
 }
