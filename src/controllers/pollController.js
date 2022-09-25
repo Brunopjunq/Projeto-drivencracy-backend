@@ -59,7 +59,7 @@ export async function getResult(req,res) {
         const votes = await db.collection('votes').find().toArray();
         const choices = await db.collection('choices').find({pollId: id}).toArray();
         const Idchoices = choices.map((choice) => choice._id.toString());
-        const filterVotes = votes.filter((vote) => choices.includes(vote.choiceId));
+        const filterVotes = votes.filter((vote) => Idchoices.includes(vote.choiceId));
         const filterVotesId = filterVotes.map((vote) => vote.choiceId);
         
         function findBiggest(votes) {
